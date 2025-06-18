@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Jarvis AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="jarvis-container">
+    <div id="logo-area">
+      <img src="icon.png" alt="Jarvis Logo" />
+      <h1>Jarvis AI</h1>
+    </div>
+    <div id="response-area">
+      <div id="response-text">Welcome. Type or speak to Jarvis AI.</div>
+    </div>
+    <div id="input-area">
+      <input type="text" id="user-input" placeholder="Say or type: Jarvis, open terminal..." />
+      <button onclick="sendInput()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    function sendInput() {
+      const input = document.getElementById('user-input').value;
+      if (input.trim() !== "") {
+        ipcRenderer.send('user-input', input);
+        document.getElementById('response-text').innerText = "Thinking...";
+      }
+    }
+  </script>
+</body>
+</html>
