@@ -1,40 +1,50 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
-const { exec } = require("child_process");
-const path = require("path");
-const fs = require("fs");
-const { interpret } = require("./core/interpreter");
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
 
-function createWindow() {
-  const win = new BrowserWindow({
+let mainWindow;
+
+function createWindow () {
+  mainWindow = new BrowserWindow({
     width: 480,
     height: 320,
-    resizable: false,
-    autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, "preload.js")
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
     },
-    icon: path.join(__dirname, "assets/icon.png"),
+    icon: path.join(__dirname, 'icon.png'),
+    title: "Jarvis AI",
+    autoHideMenuBar: true,
   });
 
-  win.loadFile("index.html");
+  mainWindow.loadFile('index.html');
 }
 
-app.whenReady().then(createWindow);
-
-// Handle user input from the renderer (index.html)
-ipcMain.on("user-input", (event, command) => {
-  console.log("User said:", command);
-
-  // Response callback
-  function respond(responseText) {
-    event.reply("bot-response", responseText);
-    // Also speak it
-    exec(`python3 speak-output.py "${responseText}"`);
-  }
-
-  interpret(command, respond);
+app.whenReady().then(() => {
+  createWindow();
+  app.on('activate', function () {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
 });
 
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") app.quit();
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') app.quit()
+});
+
+ipcMain.handle('jarvis-command', async (event, userInput) => {
+  // You can replace this logic with advanced AI / Python calls
+  let response = "This is a demo response.";
+
+  // Simple examples:
+  if (userInput.toLowerCase().includes("hello")) {
+    response = "Hi there! I'm Jarvis.";
+  } else if (userInput.toLowerCase().includes("open terminal")) {
+    require('child_process').exec('lxterminal');
+    response = "Opening terminal for you!";
+  } else if (userInput.toLowerCase().includes("create note")) {
+    require('fs').writeFileSync("note.txt", "This is a new note created by Jarvis.");
+    response = "Note created successfully.";
+  }
+
+  return response;
 });
