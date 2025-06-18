@@ -1,0 +1,12 @@
+{
+  "name": "jarvis-pi-app",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^25.0.0",
+    "express": "^4.18.2"
+  }
+}

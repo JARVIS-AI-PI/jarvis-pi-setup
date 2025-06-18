@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Jarvis AI</title><link rel="stylesheet" href="style.css"></head>
+<body>
+  <div id="chat">
+    <h2>Jarvis AI is Ready</h2>
+    <div id="conversation"></div>
+    <input type="text" id="userInput" placeholder="Say something..." autofocus />
+  </div>
+<script>
+document.getElementById("userInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    const msg = this.value;
+    document.getElementById("conversation").innerHTML += "<div>You: " + msg + "</div>";
+    this.value = "";
+  }
+});
+</script>
+</body>
+</html>
