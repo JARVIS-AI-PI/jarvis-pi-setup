@@ -1,35 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Jarvis AI</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: white;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    #chat {
+      padding: 10px;
+      height: 80vh;
+      overflow-y: auto;
+    }
+    #input-bar {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      padding: 10px;
+      background: #111;
+    }
+    #user-input {
+      flex-grow: 1;
+      padding: 8px;
+      font-size: 16px;
+    }
+    #send-btn {
+      padding: 8px 16px;
+      font-size: 16px;
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      margin-left: 8px;
+    }
+    .user {
+      color: #00ffff;
+    }
+    .jarvis {
+      color: #7CFC00;
+    }
+  </style>
 </head>
 <body>
-  <div id="jarvis-container">
-    <div id="logo-area">
-      <img src="icon.png" alt="Jarvis Logo" />
-      <h1>Jarvis AI</h1>
-    </div>
-    <div id="response-area">
-      <div id="response-text">Welcome. Type or speak to Jarvis AI.</div>
-    </div>
-    <div id="input-area">
-      <input type="text" id="user-input" placeholder="Say or type: Jarvis, open terminal..." />
-      <button onclick="sendInput()">Send</button>
-    </div>
+  <div id="chat"></div>
+  <div id="input-bar">
+    <input type="text" id="user-input" placeholder="Speak or type to Jarvis..." autofocus />
+    <button id="send-btn">Send</button>
   </div>
-
   <script>
-    const { ipcRenderer } = require('electron');
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
 
-    function sendInput() {
-      const input = document.getElementById('user-input').value;
-      if (input.trim() !== "") {
-        ipcRenderer.send('user-input', input);
-        document.getElementById('response-text').innerText = "Thinking...";
-      }
+    function appendMessage(sender, text) {
+      const div = document.createElement('div');
+      div.className = sender;
+      div.innerText = sender === 'user' ? `You: ${text}` : `Jarvis: ${text}`;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
     }
+
+    sendBtn.addEventListener('click', () => {
+      const msg = input.value.trim();
+      if (msg) {
+        appendMessage('user', msg);
+        window.jarvis.sendCommand(msg);
+        input.value = '';
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    window.jarvis.onResponse((text) => {
+      appendMessage('jarvis', text);
+    });
   </script>
 </body>
 </html>
