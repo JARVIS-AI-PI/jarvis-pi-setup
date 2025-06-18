@@ -1,0 +1,67 @@
+body {
+  background-color: #0a0a0a;
+  color: #00ffcc;
+  font-family: 'Segoe UI', sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+#jarvis-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 10px;
+}
+
+#logo-area img {
+  width: 70px;
+  height: 70px;
+}
+
+#logo-area h1 {
+  font-size: 24px;
+  margin: 10px 0;
+  color: #00ffee;
+}
+
+#response-area {
+  background-color: #1f1f1f;
+  border-radius: 10px;
+  padding: 20px;
+  width: 90%;
+  margin: 10px auto;
+  min-height: 60px;
+  box-shadow: 0 0 8px #00ffcc;
+}
+
+#input-area {
+  margin-top: 20px;
+}
+
+#user-input {
+  padding: 10px;
+  font-size: 14px;
+  width: 70%;
+  border-radius: 5px;
+  border: 1px solid #00ffee;
+  background-color: #101010;
+  color: white;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 14px;
+  margin-left: 10px;
+  background-color: #00ffee;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #00ccaa;
+}
