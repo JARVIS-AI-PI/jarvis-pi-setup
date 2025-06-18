@@ -1,0 +1,12 @@
+{
+  "name": "jarvis-ai",
+  "version": "1.0.0",
+  "description": "Offline-capable voice + text AI assistant",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "electron": "^26.2.0"
+  }
+}
