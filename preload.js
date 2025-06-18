@@ -1,6 +1,6 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld('jarvisAPI', {
-  sendMessage: (msg) => ipcRenderer.send('user-message', msg),
-  onReply: (callback) => ipcRenderer.on('jarvis-reply', (_, response) => callback(response))
+contextBridge.exposeInMainWorld("jarvis", {
+  sendCommand: (command) => ipcRenderer.send("user-input", command),
+  onResponse: (callback) => ipcRenderer.on("bot-response", (event, response) => callback(response))
 });
