@@ -1,0 +1,7 @@
+body { margin:0; font-family: sans-serif; background:#111; color:#0f0; }
+#chat { padding:10px; height:90vh; overflow:auto; }
+.you { text-align:left; margin:5px; }
+.jarvis { text-align:right; margin:5px; color:#0af; }
+#inputArea { display:flex; border-top:1px solid #333; }
+#userInput { flex:1; padding:10px; border:none; background:#222; color:#0f0; }
+#sendBtn { padding:10px; border:none; background:#0f0; color:#111; cursor:pointer; }
