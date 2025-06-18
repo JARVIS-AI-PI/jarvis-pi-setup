@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Jarvis AI
-Exec=npm start --prefix /home/pi/Desktop/Jarvis
-Icon=utilities-terminal
-Terminal=false
-Type=Application
-Categories=Utility;
