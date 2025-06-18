@@ -1,40 +1,40 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const { exec } = require('child_process');
-const path = require('path');
-const say = require('say');
+const { app, BrowserWindow, ipcMain } = require("electron");
+const { exec } = require("child_process");
+const path = require("path");
+const fs = require("fs");
+const { interpret } = require("./core/interpreter");
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 480,
     height: 320,
-    icon: path.join(__dirname, 'icon.png'),
+    resizable: false,
+    autoHideMenuBar: true,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+      preload: path.join(__dirname, "preload.js")
+    },
+    icon: path.join(__dirname, "assets/icon.png"),
   });
 
-  win.setMenu(null);
-  win.loadFile('index.html');
+  win.loadFile("index.html");
 }
 
-app.whenReady().then(() => {
-  createWindow();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+app.whenReady().then(createWindow);
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+// Handle user input from the renderer (index.html)
+ipcMain.on("user-input", (event, command) => {
+  console.log("User said:", command);
 
-// Handle messages from UI
-ipcMain.on('user-input', (event, message) => {
-  const msg = message.toLowerCase().trim();
-  if (msg.startsWith("jarvis")) {
-    const command = msg.replace("jarvis", "").trim();
-    if (command.includes("open terminal")) exec("lxterminal");
-    else if (command.includes("say hello")) say.speak("Hello, I am Jarvis.");
-    else say.speak("This is a demo response. I heard: " + command);
+  // Response callback
+  function respond(responseText) {
+    event.reply("bot-response", responseText);
+    // Also speak it
+    exec(`python3 speak-output.py "${responseText}"`);
   }
+
+  interpret(command, respond);
+});
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") app.quit();
 });
