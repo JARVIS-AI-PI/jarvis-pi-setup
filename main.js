@@ -1,53 +1,38 @@
-const { ipcRenderer } = require('electron');
+// main.js
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const interpret = require('./core/interpreter');
+const { exec } = require('child_process');
 
-const inputBox = document.getElementById('input-box');
-const sendButton = document.getElementById('send-button');
-const output = document.getElementById('output');
+let win;
 
-function printOutput(text) {
-  const line = document.createElement('div');
-  line.innerText = "Jarvis: " + text;
-  output.appendChild(line);
-  output.scrollTop = output.scrollHeight;
-}
-
-function speak(text) {
-  ipcRenderer.send('speak-text', text);
-}
-
-function handleCommand(cmd) {
-  const inputLine = document.createElement('div');
-  inputLine.innerText = "You: " + cmd;
-  output.appendChild(inputLine);
-  output.scrollTop = output.scrollHeight;
-
-  // Send to backend
-  ipcRenderer.invoke('process-input', cmd).then(response => {
-    printOutput(response);
-    speak(response);
+function createWindow() {
+  win = new BrowserWindow({
+    width: 480,
+    height: 320,
+    icon: path.join(__dirname, 'jarvis-icon.png'),
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false
+    }
   });
+
+  win.loadFile('index.html');
 }
 
-sendButton.addEventListener('click', () => {
-  const cmd = inputBox.value.trim();
-  if (cmd !== '') {
-    handleCommand(cmd);
-    inputBox.value = '';
-  }
+app.whenReady().then(() => {
+  createWindow();
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  });
 });
 
-inputBox.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter') {
-    sendButton.click();
-  }
+ipcMain.handle('process-input', async (e, input) => {
+  const response = await interpret(input);
+  return response;
 });
 
-// Handle response from mic listener (Python)
-ipcRenderer.on('voice-command', (_, message) => {
-  handleCommand(message);
+ipcMain.on('speak-text', (e, text) => {
+  exec(`espeak "${text}"`);
 });
-
-// Auto greeting
-window.onload = () => {
-  printOutput("Hello, I am Jarvis AI. How can I assist you?");
-};
