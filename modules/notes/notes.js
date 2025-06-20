@@ -1,54 +1,43 @@
 // modules/notes/notes.js
 
 const fs = require("fs");
-const path = require("path");
+const notesPath = "./jarvis-data/notes.json";
 
-const notesFile = path.join(__dirname, "user-notes.json");
-
-function saveNote(text, callback) {
-    if (!text) return callback("Note is empty.");
-
-    let notes = [];
-    if (fs.existsSync(notesFile)) {
-        notes = JSON.parse(fs.readFileSync(notesFile, "utf-8"));
-    }
-
-    const note = {
-        text: text,
-        timestamp: new Date().toISOString(),
-    };
-
-    notes.push(note);
-    fs.writeFileSync(notesFile, JSON.stringify(notes, null, 2));
-
-    callback("Note saved.");
+function loadNotes() {
+  if (!fs.existsSync(notesPath)) return [];
+  try {
+    const data = fs.readFileSync(notesPath, "utf8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
 }
 
-function readNotes(callback) {
-    if (!fs.existsSync(notesFile)) {
-        return callback("No notes found.");
-    }
-
-    const notes = JSON.parse(fs.readFileSync(notesFile, "utf-8"));
-    if (notes.length === 0) return callback("No notes available.");
-
-    const noteTexts = notes.map((n, i) => `${i + 1}. ${n.text}`).join("\n");
-    callback(noteTexts);
+function saveNotes(notes) {
+  fs.writeFileSync(notesPath, JSON.stringify(notes, null, 2));
 }
 
-function deleteLastNote(callback) {
-    if (!fs.existsSync(notesFile)) return callback("No notes to delete.");
+module.exports = async function handleNotes(input) {
+  const text = input.toLowerCase();
+  const notes = loadNotes();
 
-    let notes = JSON.parse(fs.readFileSync(notesFile, "utf-8"));
-    if (notes.length === 0) return callback("No notes found.");
+  if (text.startsWith("make a note") || text.startsWith("note")) {
+    const noteText = input.replace(/(make a note|note down|note)\s?/i, "").trim();
+    if (!noteText) return "What should I note down?";
+    notes.push({ text: noteText, date: new Date().toLocaleString() });
+    saveNotes(notes);
+    return `Noted: ${noteText}`;
+  }
 
-    notes.pop();
-    fs.writeFileSync(notesFile, JSON.stringify(notes, null, 2));
-    callback("Last note deleted.");
-}
+  if (text.includes("show my notes") || text.includes("list notes")) {
+    if (notes.length === 0) return "You have no saved notes.";
+    return notes.map((n, i) => `${i + 1}. ${n.text} (${n.date})`).join("\n");
+  }
 
-module.exports = {
-    saveNote,
-    readNotes,
-    deleteLastNote,
+  if (text.includes("delete all notes")) {
+    saveNotes([]);
+    return "All notes deleted.";
+  }
+
+  return false;
 };
