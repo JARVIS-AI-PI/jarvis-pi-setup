@@ -1,0 +1,22 @@
+[
+  {
+    "keywords": ["tiger", "national animal"],
+    "answer": "The national animal of India is the Bengal Tiger."
+  },
+  {
+    "keywords": ["lotus", "national flower"],
+    "answer": "The national flower of India is the Lotus."
+  },
+  {
+    "keywords": ["mount everest", "highest mountain"],
+    "answer": "Mount Everest is the highest mountain in the world."
+  },
+  {
+    "keywords": ["light year", "distance"],
+    "answer": "A light year is the distance light travels in one year."
+  },
+  {
+    "keywords": ["oxygen", "air"],
+    "answer": "Oxygen is essential for human respiration."
+  }
+]
