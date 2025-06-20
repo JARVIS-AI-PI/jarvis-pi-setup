@@ -1,42 +1,53 @@
-const fs = require('fs');
-const path = require('path');
-const readline = require('readline');
-const { exec } = require('child_process');
-const interpreter = require('./core/interpreter');
-const memory = require('./modules/memory/short-term');
+const { ipcRenderer } = require('electron');
 
-// Setup readline for keyboard input
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
+const inputBox = document.getElementById('input-box');
+const sendButton = document.getElementById('send-button');
+const output = document.getElementById('output');
+
+function printOutput(text) {
+  const line = document.createElement('div');
+  line.innerText = "Jarvis: " + text;
+  output.appendChild(line);
+  output.scrollTop = output.scrollHeight;
+}
+
+function speak(text) {
+  ipcRenderer.send('speak-text', text);
+}
+
+function handleCommand(cmd) {
+  const inputLine = document.createElement('div');
+  inputLine.innerText = "You: " + cmd;
+  output.appendChild(inputLine);
+  output.scrollTop = output.scrollHeight;
+
+  // Send to backend
+  ipcRenderer.invoke('process-input', cmd).then(response => {
+    printOutput(response);
+    speak(response);
+  });
+}
+
+sendButton.addEventListener('click', () => {
+  const cmd = inputBox.value.trim();
+  if (cmd !== '') {
+    handleCommand(cmd);
+    inputBox.value = '';
+  }
 });
 
-// Text-to-speech function
-function speak(text) {
-  console.log('🗣️ ' + text);
-  exec(`espeak "${text.replace(/"/g, "'")}"`);
-}
+inputBox.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') {
+    sendButton.click();
+  }
+});
 
-// Handle command input (from keyboard or mic)
-function processInput(input) {
-  if (!input || input.trim() === '') return;
+// Handle response from mic listener (Python)
+ipcRenderer.on('voice-command', (_, message) => {
+  handleCommand(message);
+});
 
-  memory.update(input); // Remember what the user said
-
-  interpreter.handle(input, (response) => {
-    if (response) speak(response);
-    else speak("I'm not sure how to respond to that.");
-  });
-}
-
-// Listen for text input
-function listenText() {
-  rl.question('🧠 You: ', (input) => {
-    processInput(input);
-    listenText(); // Wait for next
-  });
-}
-
-// Optional: Voice input loop
-// (Later you can connect `mic-listener.py` for automatic mode)
-listenText();
+// Auto greeting
+window.onload = () => {
+  printOutput("Hello, I am Jarvis AI. How can I assist you?");
+};
