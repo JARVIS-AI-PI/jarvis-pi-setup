@@ -1,22 +1,47 @@
-const fs = require('fs');
-const path = require('path');
+// modules/notes/notes.js
 
-function saveNote(filename, content, callback) {
-  const notesDir = path.join(__dirname, '../saved_notes');
-  if (!fs.existsSync(notesDir)) {
-    fs.mkdirSync(notesDir);
-  }
+const fs = require("fs");
+const path = require("path");
 
-  const filePath = path.join(notesDir, filename);
-  fs.writeFile(filePath, content, (err) => {
-    if (err) {
-      console.error("[NOTES ERROR]:", err);
-      callback(`Failed to save note: ${err.message}`);
-    } else {
-      console.log(`[NOTE SAVED]: ${filename}`);
-      callback(`Note "${filename}" saved successfully.`);
+const notesFile = path.join(__dirname, "jarvis-notes.json");
+
+function loadNotes() {
+    try {
+        return JSON.parse(fs.readFileSync(notesFile, "utf8"));
+    } catch (err) {
+        return {};
     }
-  });
 }
 
-module.exports = { saveNote };
+function saveNotes(notes) {
+    fs.writeFileSync(notesFile, JSON.stringify(notes, null, 2));
+}
+
+function addNote(topic, content) {
+    const notes = loadNotes();
+    notes[topic.toLowerCase()] = content;
+    saveNotes(notes);
+    return `Noted: ${topic}`;
+}
+
+function getNote(topic) {
+    const notes = loadNotes();
+    return notes[topic.toLowerCase()] || `No memory found for: ${topic}`;
+}
+
+function deleteNote(topic) {
+    const notes = loadNotes();
+    if (notes[topic.toLowerCase()]) {
+        delete notes[topic.toLowerCase()];
+        saveNotes(notes);
+        return `Deleted note: ${topic}`;
+    } else {
+        return `No memory to delete for: ${topic}`;
+    }
+}
+
+module.exports = {
+    addNote,
+    getNote,
+    deleteNote,
+};
