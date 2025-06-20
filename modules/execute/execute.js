@@ -1,22 +1,22 @@
+// modules/execute/execute.js
+
 const { exec } = require("child_process");
 
-function runCommand(command, callback) {
+function executeCommand(command, callback) {
+  if (!command) return callback("No command provided.");
+
   exec(command, (error, stdout, stderr) => {
     if (error) {
-      console.error("[ERROR]", error.message);
-      callback(`Error: ${error.message}`);
-      return;
+      console.error("Execution error:", error.message);
+      return callback(`Error: ${error.message}`);
     }
-
     if (stderr) {
-      console.warn("[STDERR]", stderr);
-      callback(`Warning: ${stderr}`);
-      return;
+      console.warn("Standard error:", stderr);
+      return callback(`Stderr: ${stderr}`);
     }
 
-    console.log("[OUTPUT]", stdout);
-    callback(stdout.trim());
+    callback(stdout || "Command executed.");
   });
 }
 
-module.exports = { runCommand };
+module.exports = executeCommand;
