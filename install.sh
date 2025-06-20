@@ -1,19 +1,32 @@
 #!/bin/bash
 
-echo "🧠 Installing Jarvis AI Dependencies..."
+echo "🔧 Installing Jarvis AI Dependencies..."
+sudo apt update && sudo apt upgrade -y
 
-sudo apt update && sudo apt install -y espeak python3 python3-pyaudio python3-pip nodejs npm xinit unclutter git
+# System packages
+sudo apt install -y espeak aplay libasound2-dev python3-pip python3-dev build-essential nmap git curl xdg-utils
 
-# Python packages
-pip3 install SpeechRecognition pyttsx3 pyaudio
+# Node.js (if not already installed)
+if ! command -v node &> /dev/null
+then
+  echo "⚙️ Installing Node.js LTS..."
+  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  sudo apt install -y nodejs
+fi
 
-# Node + Electron
-sudo npm install -g electron
+# Python dependencies
+pip3 install SpeechRecognition pyaudio
 
-# Clone your GitHub repo
-mkdir -p $HOME/Desktop/JarvisAI
-cd $HOME/Desktop/JarvisAI
-git clone https://github.com/JARVIS-AI-PI/jarvis-pi-setup.git .
+# Node.js dependencies
+npm install
 
-echo "✅ All Dependencies Installed!"
-echo "🧠 You can now launch Jarvis AI from the desktop icon."
+# Make desktop launcher
+mkdir -p ~/.config/autostart
+cp Jarvis.desktop ~/.config/autostart/Jarvis.desktop
+
+# Permissions
+chmod +x run.sh
+chmod +x install.sh
+
+echo "✅ Installation complete. You can run Jarvis now with:"
+echo "  ./run.sh"
