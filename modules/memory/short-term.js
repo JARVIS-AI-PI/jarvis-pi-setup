@@ -1,10 +1,12 @@
 let history = [];
 
-module.exports = {
-  remember: () => history.join(' '),
-  update: (msg) => {
-    if (history.length > 5) history.shift();
-    history.push(msg);
-  },
-  clear: () => { history = []; }
-};
+function update(input) {
+  if (input) history.push({ input, time: new Date() });
+  if (history.length > 50) history.shift(); // keep it short
+}
+
+function remember() {
+  return history.map(h => h.input).join("\n");
+}
+
+module.exports = { update, remember };
