@@ -1,36 +1,42 @@
+// interpreter.js — understands input and routes to modules
+
 const fs = require('fs');
 const path = require('path');
 
-const modulesPath = path.join(__dirname, '..', 'modules');
-const modules = {};
+const MODULES_PATH = path.join(__dirname, '..', 'modules');
 
-fs.readdirSync(modulesPath).forEach(folder => {
-  const moduleFile = path.join(modulesPath, folder, `${folder}.js`);
-  if (fs.existsSync(moduleFile)) {
-    try {
-      modules[folder] = require(moduleFile);
-    } catch (err) {
-      console.error(`❌ Failed to load module '${folder}':`, err);
+function loadModules() {
+    const modules = {};
+    const folders = fs.readdirSync(MODULES_PATH);
+
+    folders.forEach(folder => {
+        const modulePath = path.join(MODULES_PATH, folder, `${folder}.js`);
+        if (fs.existsSync(modulePath)) {
+            try {
+                modules[folder] = require(modulePath);
+            } catch (err) {
+                console.error(`Error loading ${folder}:`, err);
+            }
+        }
+    });
+
+    return modules;
+}
+
+const modules = loadModules();
+
+async function interpret(input, context = {}) {
+    input = input.trim().toLowerCase();
+
+    for (const [name, mod] of Object.entries(modules)) {
+        if (typeof mod.match === 'function' && await mod.match(input)) {
+            if (typeof mod.execute === 'function') {
+                return await mod.execute(input, context);
+            }
+        }
     }
-  } else {
-    console.warn(`⚠️ No module file found for '${folder}'`);
-  }
-});
 
-function interpret(command, callback) {
-  const commandLower = command.toLowerCase();
-
-  for (const [name, mod] of Object.entries(modules)) {
-    if (typeof mod.match === 'function' && mod.match(commandLower)) {
-      if (typeof mod.execute === 'function') {
-        return mod.execute(commandLower, callback);
-      } else {
-        console.warn(`⚠️ Module '${name}' has no execute()`);
-      }
-    }
-  }
-
-  callback(`Sorry, I didn’t understand: "${command}"`);
+    return "I'm not sure how to respond to that yet.";
 }
 
 module.exports = { interpret };
