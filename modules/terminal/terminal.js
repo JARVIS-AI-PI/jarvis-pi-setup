@@ -1,15 +1,22 @@
+// modules/terminal/terminal.js
+
 const { exec } = require("child_process");
 
-function runTerminalCommand(command, callback) {
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.error(`[TERMINAL ERROR]: ${stderr}`);
-      callback(`Error: ${stderr}`);
-      return;
+function executeTerminalCommand(command, callback) {
+    if (!command) {
+        callback("No command provided.");
+        return;
     }
-    console.log(`[TERMINAL OUTPUT]: ${stdout}`);
-    callback(stdout);
-  });
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            callback(`Error: ${stderr || error.message}`);
+        } else {
+            callback(stdout || "Command executed.");
+        }
+    });
 }
 
-module.exports = { runTerminalCommand };
+module.exports = {
+    executeTerminalCommand,
+};
