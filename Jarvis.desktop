@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Jarvis AI
-Exec=/home/pi/Jarvis-AI-PI/run.sh
-Icon=/home/pi/Jarvis-AI-PI/jarvis-icon.png
-Type=Application
-Comment=Launch Jarvis AI
+Comment=Launch Jarvis Assistant
+Exec=/home/pi/jarvis-pi-setup/run.sh
+Icon=/home/pi/jarvis-pi-setup/jarvis-icon.png
 Terminal=false
+Type=Application
 Categories=Utility;
