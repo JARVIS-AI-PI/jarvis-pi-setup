@@ -1,67 +1,55 @@
 body {
-  background-color: #0a0a0a;
-  color: #00ffcc;
-  font-family: 'Segoe UI', sans-serif;
-  text-align: center;
   margin: 0;
   padding: 0;
-}
-
-#jarvis-container {
+  background-color: #1e1e2f;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffffff;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   height: 100vh;
+}
+
+#header {
+  background-color: #282c34;
   padding: 10px;
+  text-align: center;
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #00ffe7;
 }
 
-#logo-area img {
-  width: 70px;
-  height: 70px;
-}
-
-#logo-area h1 {
-  font-size: 24px;
-  margin: 10px 0;
-  color: #00ffee;
-}
-
-#response-area {
-  background-color: #1f1f1f;
-  border-radius: 10px;
-  padding: 20px;
-  width: 90%;
-  margin: 10px auto;
-  min-height: 60px;
-  box-shadow: 0 0 8px #00ffcc;
-}
-
-#input-area {
-  margin-top: 20px;
-}
-
-#user-input {
+#output {
+  flex: 1;
   padding: 10px;
-  font-size: 14px;
-  width: 70%;
+  overflow-y: auto;
+  font-size: 0.9em;
+  white-space: pre-wrap;
+}
+
+#input-container {
+  display: flex;
+  padding: 10px;
+  background-color: #2e2e3a;
+}
+
+#input-box {
+  flex: 1;
+  padding: 8px;
+  font-size: 1em;
+  border: none;
   border-radius: 5px;
-  border: 1px solid #00ffee;
-  background-color: #101010;
+  outline: none;
+  background-color: #444;
   color: white;
 }
 
-button {
-  padding: 10px 15px;
-  font-size: 14px;
+#send-button {
   margin-left: 10px;
-  background-color: #00ffee;
-  color: black;
+  padding: 8px 15px;
+  font-size: 1em;
+  background-color: #00ffe7;
+  color: #000;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-}
-
-button:hover {
-  background-color: #00ccaa;
 }
