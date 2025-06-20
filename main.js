@@ -1,38 +1,27 @@
-// main.js
+// main.js (Electron Main Process)
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const interpret = require('./core/interpreter');
-const { exec } = require('child_process');
 
 let win;
-
 function createWindow() {
   win = new BrowserWindow({
-    width: 480,
-    height: 320,
-    icon: path.join(__dirname, 'jarvis-icon.png'),
+    width: 480, height: 320,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false
+      contextIsolation: true
     }
   });
-
   win.loadFile('index.html');
 }
-
-app.whenReady().then(() => {
-  createWindow();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+app.whenReady().then(createWindow);
 
 ipcMain.handle('process-input', async (e, input) => {
-  const response = await interpret(input);
-  return response;
+  const say = (text) => win.webContents.send('voice-output', text);
+  const result = await interpret(input, say);
+  return result;
 });
 
 ipcMain.on('speak-text', (e, text) => {
-  exec(`espeak "${text}"`);
+  require('child_process').exec(`espeak "${text}"`);
 });
