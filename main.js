@@ -1,42 +1,42 @@
-const modules = require('./modules/index.js');
-const say = require('child_process').execSync;
-
-const memory = require('./modules/memory/short-term.js');
-
-function speak(text) {
-  console.log("JARVIS:", text);
-  say(`espeak "${text.replace(/"/g, '')}"`);
-}
-
-function processInput(input) {
-  memory.update(input);
-
-  let handled = false;
-
-  for (let mod of modules) {
-    if (mod && typeof mod.execute === 'function') {
-      mod.execute(input, (response) => {
-        if (response) speak(response);
-        handled = true;
-      });
-    }
-  }
-
-  if (!handled) {
-    speak("I'm still learning how to handle that.");
-  }
-}
-
-// Sample: simulate input from command line or mic
+const fs = require('fs');
+const path = require('path');
 const readline = require('readline');
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+const { exec } = require('child_process');
+const interpreter = require('./core/interpreter');
+const memory = require('./modules/memory/short-term');
 
-function prompt() {
-  rl.question("You: ", (answer) => {
-    processInput(answer);
-    prompt();
+// Setup readline for keyboard input
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+// Text-to-speech function
+function speak(text) {
+  console.log('🗣️ ' + text);
+  exec(`espeak "${text.replace(/"/g, "'")}"`);
+}
+
+// Handle command input (from keyboard or mic)
+function processInput(input) {
+  if (!input || input.trim() === '') return;
+
+  memory.update(input); // Remember what the user said
+
+  interpreter.handle(input, (response) => {
+    if (response) speak(response);
+    else speak("I'm not sure how to respond to that.");
   });
 }
 
-speak("Hello, I'm JARVIS. Ready to assist you.");
-prompt();
+// Listen for text input
+function listenText() {
+  rl.question('🧠 You: ', (input) => {
+    processInput(input);
+    listenText(); // Wait for next
+  });
+}
+
+// Optional: Voice input loop
+// (Later you can connect `mic-listener.py` for automatic mode)
+listenText();
