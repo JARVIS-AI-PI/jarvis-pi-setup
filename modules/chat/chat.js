@@ -1,35 +1,41 @@
 // modules/chat/chat.js
 
-const axios = require('axios');
+const fetch = require("node-fetch");
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "your-openai-key-here";
+const OFFLINE_QA = {
+  "what is your name": "I am Jarvis AI, your personal assistant.",
+  "how are you": "I'm always online for you!",
+  "who made you": "I was created by my master, powered by OpenAI-level intelligence."
+};
 
-async function respond(input) {
-    try {
-        const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
-            {
-                model: "gpt-3.5-turbo",
-                messages: [
-                    { role: "system", content: "You are Jarvis AI, an intelligent assistant." },
-                    { role: "user", content: input }
-                ]
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
-        const answer = response.data.choices[0].message.content.trim();
-        return answer;
+module.exports = async function handleChat(input) {
+  const text = input.toLowerCase();
 
-    } catch (err) {
-        console.error("[chat module] Error:", err.message);
-        return "Sorry, I couldn't process that.";
-    }
-}
+  // Offline fallback
+  if (!OPENAI_API_KEY) {
+    return OFFLINE_QA[text] || "Sorry, I can't answer that offline.";
+  }
 
-module.exports = { respond };
+  // Online OpenAI call
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: input }],
+        temperature: 0.7
+      })
+    });
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || "Sorry, I didn't understand that.";
+  } catch (err) {
+    return "An error occurred while talking to the AI.";
+  }
+};
