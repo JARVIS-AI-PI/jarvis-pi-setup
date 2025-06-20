@@ -1,28 +1,22 @@
 // core/interpreter.js
 
-const path = require('path');
-const modules = require('../modules/index.js/index.js');
+const modules = require('../modules/index.js');
 
-async function interpret(inputText) {
-    console.log(`[Interpreter] Received input: "${inputText}"`);
+async function interpret(input) {
+  input = input.toLowerCase();
 
-    // Convert input to lowercase for easier matching
-    const text = inputText.toLowerCase();
-
-    // Loop through modules and let each try to respond
-    for (const [name, module] of Object.entries(modules)) {
-        try {
-            const result = await module.respond(text);
-            if (result) {
-                console.log(`[Interpreter] Responding via ${name} module.`);
-                return result;
-            }
-        } catch (error) {
-            console.error(`[Interpreter] Error in module '${name}':`, error);
-        }
+  for (const mod of modules) {
+    if (mod.match && mod.match(input)) {
+      try {
+        const response = await mod.execute(input);
+        return response || "Done.";
+      } catch (err) {
+        return `Error in ${mod.name || 'module'}: ${err.message}`;
+      }
     }
+  }
 
-    return `I'm sorry, I couldn't understand that.`;
+  return "I'm sorry, I didn't understand that.";
 }
 
-module.exports = { interpret };
+module.exports = interpret;
