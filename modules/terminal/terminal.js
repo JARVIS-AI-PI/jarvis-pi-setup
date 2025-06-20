@@ -1,22 +1,19 @@
 // modules/terminal/terminal.js
 
 const { exec } = require("child_process");
+const speak = require("../../speak-output");
 
-function executeTerminalCommand(command, callback) {
-    if (!command) {
-        callback("No command provided.");
-        return;
-    }
-
+function runTerminalCommand(command, callback) {
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            callback(`Error: ${stderr || error.message}`);
-        } else {
-            callback(stdout || "Command executed.");
+            speak.sayText(`Error: ${stderr}`);
+            return callback(`Error: ${stderr}`);
         }
+        speak.sayText(`Output: ${stdout}`);
+        callback(stdout);
     });
 }
 
 module.exports = {
-    executeTerminalCommand,
+    runTerminalCommand
 };
