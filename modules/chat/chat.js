@@ -1,31 +1,35 @@
-const { exec } = require("child_process");
+// modules/chat/chat.js
 
-// Simple offline-like response system
-function getChatResponse(message) {
-  message = message.toLowerCase();
+const axios = require('axios');
 
-  if (message.includes("hello") || message.includes("hi")) {
-    return "Hello! How can I assist you today?";
-  }
-  if (message.includes("who are you")) {
-    return "I am Jarvis, your personal AI assistant.";
-  }
-  if (message.includes("how are you")) {
-    return "I'm functioning as expected. How can I help?";
-  }
-  if (message.includes("time")) {
-    return new Date().toLocaleTimeString();
-  }
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "your-openai-key-here";
 
-  return "I'm still learning. Please try another question.";
+async function respond(input) {
+    try {
+        const response = await axios.post(
+            'https://api.openai.com/v1/chat/completions',
+            {
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { role: "system", content: "You are Jarvis AI, an intelligent assistant." },
+                    { role: "user", content: input }
+                ]
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        const answer = response.data.choices[0].message.content.trim();
+        return answer;
+
+    } catch (err) {
+        console.error("[chat module] Error:", err.message);
+        return "Sorry, I couldn't process that.";
+    }
 }
 
-function speakResponse(response) {
-  exec(`espeak "${response}"`);
-  console.log("[CHAT]", response);
-}
-
-module.exports = {
-  getChatResponse,
-  speakResponse
-};
+module.exports = { respond };
