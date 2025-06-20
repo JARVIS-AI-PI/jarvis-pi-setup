@@ -1,42 +1,28 @@
-// interpreter.js — understands input and routes to modules
+// core/interpreter.js
 
-const fs = require('fs');
 const path = require('path');
+const modules = require('../modules/index.js/index.js');
 
-const MODULES_PATH = path.join(__dirname, '..', 'modules');
+async function interpret(inputText) {
+    console.log(`[Interpreter] Received input: "${inputText}"`);
 
-function loadModules() {
-    const modules = {};
-    const folders = fs.readdirSync(MODULES_PATH);
+    // Convert input to lowercase for easier matching
+    const text = inputText.toLowerCase();
 
-    folders.forEach(folder => {
-        const modulePath = path.join(MODULES_PATH, folder, `${folder}.js`);
-        if (fs.existsSync(modulePath)) {
-            try {
-                modules[folder] = require(modulePath);
-            } catch (err) {
-                console.error(`Error loading ${folder}:`, err);
+    // Loop through modules and let each try to respond
+    for (const [name, module] of Object.entries(modules)) {
+        try {
+            const result = await module.respond(text);
+            if (result) {
+                console.log(`[Interpreter] Responding via ${name} module.`);
+                return result;
             }
-        }
-    });
-
-    return modules;
-}
-
-const modules = loadModules();
-
-async function interpret(input, context = {}) {
-    input = input.trim().toLowerCase();
-
-    for (const [name, mod] of Object.entries(modules)) {
-        if (typeof mod.match === 'function' && await mod.match(input)) {
-            if (typeof mod.execute === 'function') {
-                return await mod.execute(input, context);
-            }
+        } catch (error) {
+            console.error(`[Interpreter] Error in module '${name}':`, error);
         }
     }
 
-    return "I'm not sure how to respond to that yet.";
+    return `I'm sorry, I couldn't understand that.`;
 }
 
 module.exports = { interpret };
