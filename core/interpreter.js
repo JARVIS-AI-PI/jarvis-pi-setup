@@ -1,22 +1,21 @@
 // core/interpreter.js
-
 const modules = require('../modules/index.js');
 
+// This function handles all user input and sends it to the correct module
 async function interpret(input) {
-  input = input.toLowerCase();
-
-  for (const mod of modules) {
-    if (mod.match && mod.match(input)) {
-      try {
-        const response = await mod.execute(input);
-        return response || "Done.";
-      } catch (err) {
-        return `Error in ${mod.name || 'module'}: ${err.message}`;
+  for (let mod of modules) {
+    try {
+      if (typeof mod.match === 'function' && mod.match(input)) {
+        // Run the correct module's response
+        return await mod.execute(input, (reply) => reply);
       }
+    } catch (err) {
+      return `⚠️ Error in ${mod.name}: ${err.message}`;
     }
   }
 
-  return "I'm sorry, I didn't understand that.";
+  // If no module matched
+  return "❌ Sorry, I didn't understand that.";
 }
 
 module.exports = interpret;
