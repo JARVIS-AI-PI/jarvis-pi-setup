@@ -1,28 +1,40 @@
+// modules/system/system.js
+
 const { exec } = require("child_process");
 
-function openApp(appName, callback) {
-  exec(`${appName} &`, (err) => {
-    if (err) return callback("Failed to open " + appName);
-    callback(`${appName} launched`);
-  });
-}
+function executeSystemCommand(command, callback) {
+    let cmd = "";
 
-function shutdown(callback) {
-  exec("sudo shutdown now", (err) => {
-    if (err) return callback("Shutdown failed");
-    callback("System shutting down...");
-  });
-}
+    switch (command.toLowerCase()) {
+        case "shutdown":
+            cmd = "sudo shutdown now";
+            break;
+        case "restart":
+            cmd = "sudo reboot";
+            break;
+        case "open terminal":
+            cmd = "lxterminal";
+            break;
+        case "open browser":
+            cmd = "chromium-browser";
+            break;
+        case "system info":
+            cmd = "neofetch || uname -a";
+            break;
+        default:
+            callback("I didn't understand that system command.");
+            return;
+    }
 
-function reboot(callback) {
-  exec("sudo reboot", (err) => {
-    if (err) return callback("Reboot failed");
-    callback("Rebooting system...");
-  });
+    exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+            callback(`Error: ${stderr || error.message}`);
+        } else {
+            callback(stdout || "Command executed successfully.");
+        }
+    });
 }
 
 module.exports = {
-  openApp,
-  shutdown,
-  reboot,
+    executeSystemCommand,
 };
