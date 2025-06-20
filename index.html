@@ -3,83 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <title>Jarvis AI</title>
-  <style>
-    body {
-      background-color: #0e0e0e;
-      color: white;
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    #chat {
-      padding: 10px;
-      height: 80vh;
-      overflow-y: auto;
-    }
-    #input-bar {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      display: flex;
-      padding: 10px;
-      background: #111;
-    }
-    #user-input {
-      flex-grow: 1;
-      padding: 8px;
-      font-size: 16px;
-    }
-    #send-btn {
-      padding: 8px 16px;
-      font-size: 16px;
-      background-color: #0078D7;
-      color: white;
-      border: none;
-      margin-left: 8px;
-    }
-    .user {
-      color: #00ffff;
-    }
-    .jarvis {
-      color: #7CFC00;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="chat"></div>
-  <div id="input-bar">
-    <input type="text" id="user-input" placeholder="Speak or type to Jarvis..." autofocus />
-    <button id="send-btn">Send</button>
+  <div id="jarvis-ui">
+    <div id="header">
+      <img src="jarvis-icon.png" alt="Jarvis AI" id="logo" />
+      <h1>Jarvis AI</h1>
+    </div>
+
+    <div id="output-box">
+      <div id="output"></div>
+    </div>
+
+    <div id="input-box">
+      <input type="text" id="input" placeholder="Ask me anything..." autofocus />
+      <button onclick="sendInput()">Send</button>
+    </div>
   </div>
-  <script>
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
 
-    function appendMessage(sender, text) {
-      const div = document.createElement('div');
-      div.className = sender;
-      div.innerText = sender === 'user' ? `You: ${text}` : `Jarvis: ${text}`;
-      chat.appendChild(div);
-      chat.scrollTop = chat.scrollHeight;
-    }
-
-    sendBtn.addEventListener('click', () => {
-      const msg = input.value.trim();
-      if (msg) {
-        appendMessage('user', msg);
-        window.jarvis.sendCommand(msg);
-        input.value = '';
-      }
-    });
-
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendBtn.click();
-    });
-
-    window.jarvis.onResponse((text) => {
-      appendMessage('jarvis', text);
-    });
-  </script>
+  <script src="main.js"></script>
 </body>
 </html>
