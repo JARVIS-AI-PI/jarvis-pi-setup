@@ -1,50 +1,42 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
+const modules = require('./modules/index.js');
+const say = require('child_process').execSync;
 
-let mainWindow;
+const memory = require('./modules/memory/short-term.js');
 
-function createWindow () {
-  mainWindow = new BrowserWindow({
-    width: 480,
-    height: 320,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
-      contextIsolation: true,
-      nodeIntegration: false
-    },
-    icon: path.join(__dirname, 'icon.png'),
-    title: "Jarvis AI",
-    autoHideMenuBar: true,
-  });
-
-  mainWindow.loadFile('index.html');
+function speak(text) {
+  console.log("JARVIS:", text);
+  say(`espeak "${text.replace(/"/g, '')}"`);
 }
 
-app.whenReady().then(() => {
-  createWindow();
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  })
-});
+function processInput(input) {
+  memory.update(input);
 
-app.on('window-all-closed', function () {
-  if (process.platform !== 'darwin') app.quit()
-});
+  let handled = false;
 
-ipcMain.handle('jarvis-command', async (event, userInput) => {
-  // You can replace this logic with advanced AI / Python calls
-  let response = "This is a demo response.";
-
-  // Simple examples:
-  if (userInput.toLowerCase().includes("hello")) {
-    response = "Hi there! I'm Jarvis.";
-  } else if (userInput.toLowerCase().includes("open terminal")) {
-    require('child_process').exec('lxterminal');
-    response = "Opening terminal for you!";
-  } else if (userInput.toLowerCase().includes("create note")) {
-    require('fs').writeFileSync("note.txt", "This is a new note created by Jarvis.");
-    response = "Note created successfully.";
+  for (let mod of modules) {
+    if (mod && typeof mod.execute === 'function') {
+      mod.execute(input, (response) => {
+        if (response) speak(response);
+        handled = true;
+      });
+    }
   }
 
-  return response;
-});
+  if (!handled) {
+    speak("I'm still learning how to handle that.");
+  }
+}
+
+// Sample: simulate input from command line or mic
+const readline = require('readline');
+const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
+function prompt() {
+  rl.question("You: ", (answer) => {
+    processInput(answer);
+    prompt();
+  });
+}
+
+speak("Hello, I'm JARVIS. Ready to assist you.");
+prompt();
