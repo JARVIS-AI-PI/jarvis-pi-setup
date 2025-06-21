@@ -1,55 +1,82 @@
+/* style.css */
+
 body {
   margin: 0;
-  padding: 0;
-  background-color: #1e1e2f;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #ffffff;
+  font-family: "Segoe UI", sans-serif;
+  background: #1e1e1e;
+  color: #fff;
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
 
-#header {
-  background-color: #282c34;
-  padding: 10px;
-  text-align: center;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #00ffe7;
-}
-
-#output {
-  flex: 1;
-  padding: 10px;
+.chat-container {
+  flex-grow: 1;
   overflow-y: auto;
-  font-size: 0.9em;
-  white-space: pre-wrap;
-}
-
-#input-container {
-  display: flex;
   padding: 10px;
-  background-color: #2e2e3a;
+  display: flex;
+  flex-direction: column;
 }
 
-#input-box {
-  flex: 1;
-  padding: 8px;
-  font-size: 1em;
-  border: none;
-  border-radius: 5px;
-  outline: none;
-  background-color: #444;
+.message {
+  max-width: 80%;
+  padding: 10px 14px;
+  margin: 5px 10px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.message.user {
+  align-self: flex-end;
+  background-color: #007acc;
   color: white;
 }
 
-#send-button {
-  margin-left: 10px;
-  padding: 8px 15px;
-  font-size: 1em;
-  background-color: #00ffe7;
-  color: #000;
+.message.bot {
+  align-self: flex-start;
+  background-color: #333;
+  color: #eee;
+}
+
+.message.typing {
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.input-area {
+  display: flex;
+  padding: 10px;
+  background: #222;
+  border-top: 1px solid #444;
+}
+
+.input-area input {
+  flex-grow: 1;
+  padding: 8px;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 16px;
+}
+
+.input-area button {
+  margin-left: 8px;
+  padding: 8px 14px;
+  border: none;
+  background-color: #007acc;
+  color: white;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.input-area button:hover {
+  background-color: #005b9e;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
