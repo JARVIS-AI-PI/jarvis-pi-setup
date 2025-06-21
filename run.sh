@@ -1,15 +1,12 @@
 #!/bin/bash
-# Start Jarvis AI interface
 
+echo "🚀 Starting JARVIS..."
+
+# Navigate to the JARVIS root directory
 cd "$(dirname "$0")"
 
-echo "Launching Jarvis AI..."
+# Set OpenAI API Key (optional: can be exported system-wide too)
+# export OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxx
 
-# Make sure Electron is installed
-if ! command -v electron &> /dev/null; then
-    echo "Electron not found. Installing..."
-    npm install electron -g
-fi
-
-# Start the main Electron process
-electron main.js
+# Start Electron app
+npx electron .
