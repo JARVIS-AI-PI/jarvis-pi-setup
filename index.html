@@ -1,27 +1,23 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Jarvis AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JARVIS AI Assistant</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="jarvis-ui">
-    <div id="header">
-      <img src="jarvis-icon.png" alt="Jarvis AI" id="logo" />
-      <h1>Jarvis AI</h1>
-    </div>
-
-    <div id="output-box">
-      <div id="output"></div>
-    </div>
-
-    <div id="input-box">
-      <input type="text" id="input" placeholder="Ask me anything..." autofocus />
-      <button onclick="sendInput()">Send</button>
-    </div>
+  <div class="chat-container" id="chat-container">
+    <div class="message bot">👋 Hello! I am JARVIS. How can I assist you?</div>
   </div>
 
-  <script src="main.js"></script>
+  <div class="input-area">
+    <input type="text" id="input" placeholder="Type a command..." autofocus />
+    <button id="send">Send</button>
+  </div>
+
+  <script src="modules/ui/ui.js"></script>
 </body>
 </html>
