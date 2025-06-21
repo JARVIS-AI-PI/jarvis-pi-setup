@@ -1,41 +1,44 @@
-// core/ui/ui.js
+// modules/ui/ui.js
 
-module.exports = {
-  applyTheme(theme) {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.style.setProperty('--bg-color', '#111');
-      root.style.setProperty('--text-color', '#eee');
-      root.style.setProperty('--bubble-color', '#222');
-    } else {
-      root.style.setProperty('--bg-color', '#fff');
-      root.style.setProperty('--text-color', '#000');
-      root.style.setProperty('--bubble-color', '#e0e0e0');
-    }
-  },
+const input = document.getElementById("input");
+const send = document.getElementById("send");
+const chat = document.getElementById("chat-container");
 
-  typingEffect(element, text, speed = 25) {
-    element.innerHTML = "";
-    let i = 0;
-    function type() {
-      if (i < text.length) {
-        element.innerHTML += text.charAt(i);
-        i++;
-        setTimeout(type, speed);
-      }
-    }
-    type();
-  },
+function addMessage(text, sender = "bot") {
+  const msg = document.createElement("div");
+  msg.className = `message ${sender}`;
+  msg.innerText = text;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-  createChatBubble(message, isUser = false) {
-    const bubble = document.createElement("div");
-    bubble.className = `chat-bubble ${isUser ? "user" : "jarvis"}`;
-    bubble.textContent = message;
-    document.querySelector(".chat-container").appendChild(bubble);
-    window.scrollTo(0, document.body.scrollHeight);
-  },
+function showTyping(callback) {
+  const typing = document.createElement("div");
+  typing.className = "message bot typing";
+  typing.innerText = "JARVIS is thinking...";
+  chat.appendChild(typing);
+  chat.scrollTop = chat.scrollHeight;
+  setTimeout(() => {
+    typing.remove();
+    callback();
+  }, 600);
+}
 
-  clearChat() {
-    document.querySelector(".chat-container").innerHTML = "";
-  }
-};
+function sendMessage() {
+  const value = input.value.trim();
+  if (!value) return;
+
+  addMessage(value, "user");
+  input.value = "";
+
+  showTyping(() => {
+    window.jarvis.call(value).then(response => {
+      addMessage(response, "bot");
+    });
+  });
+}
+
+send.addEventListener("click", sendMessage);
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter") sendMessage();
+});
