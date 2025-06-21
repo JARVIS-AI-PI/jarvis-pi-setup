@@ -1,32 +1,20 @@
 #!/bin/bash
 
-echo "🛠️ Installing JARVIS requirements..."
+echo "🛠️ Installing JARVIS dependencies..."
 
-# Update system packages
-sudo apt update && sudo apt install -y nodejs npm espeak
+# Update system
+sudo apt update && sudo apt install -y curl git build-essential
 
-# Install Electron globally (in case it's not already)
+# Install Node.js (LTS version)
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Install Electron globally (for UI)
 npm install --save electron
-npm install axios
 
-# Optional: Install Electron globally if preferred
-# sudo npm install -g electron
+# Optional: install espeak or voice packages here later
 
-echo "✅ Dependencies installed."
-
-# Create JARVIS desktop shortcut
-DESKTOP_FILE="$HOME/Desktop/JARVIS.desktop"
-ICON_PATH="$PWD/assets/icon.png" # Replace with your real icon path
-
-echo "[Desktop Entry]
-Name=JARVIS AI
-Exec=$PWD/run.sh
-Icon=$ICON_PATH
-Terminal=false
-Type=Application
-Categories=Utility;" > "$DESKTOP_FILE"
-
-chmod +x "$DESKTOP_FILE"
+# Make run.sh executable
 chmod +x run.sh
 
-echo "🎉 Setup complete! Launch JARVIS from the desktop or by running ./run.sh"
+echo "✅ All set! Run JARVIS with: ./run.sh"
