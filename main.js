@@ -1,40 +1,41 @@
 // main.js
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const interpreter = require('./core/interpreter'); // Main brain logic
 
-let mainWindow;
+const readline = require("readline");
+const modules = require("./core/module-loader");
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 480, // Your 2.8-inch display size
-    height: 320,
-    resizable: false,
-    autoHideMenuBar: true,
-    icon: path.join(__dirname, 'jarvis-icon.png'),
-    webPreferences: {
-      contextIsolation: true,
-      preload: path.join(__dirname, 'preload.js'),
-    },
-  });
+function handleInput(input) {
+  const args = input.trim().split(" ");
+  const command = args.shift().toLowerCase();
 
-  mainWindow.loadFile('index.html');
+  const mod = modules.find(m => m.name === command);
+
+  if (!mod) {
+    console.log(`❌ Command not found: '${command}'`);
+    return;
+  }
+
+  try {
+    mod.run(args, (output) => {
+      console.log(`💬 ${output}`);
+    });
+  } catch (err) {
+    console.error(`❌ Error running module '${command}':`, err.message);
+  }
 }
 
-app.whenReady().then(createWindow);
+// If running in terminal, enable manual input
+if (require.main === module) {
+  console.log("🧠 JARVIS AI Terminal Mode\nType a command (e.g., tutor gravity):");
 
-app.on('window-all-closed', () => {
-  // On Raspberry Pi, keep app running unless closed manually
-  if (process.platform !== 'darwin') app.quit();
-});
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-// IPC from renderer (index.html UI) → Node backend
-ipcMain.handle('process-input', async (event, userInput) => {
-  const result = await interpreter(userInput);
-  return result;
-});
+  rl.on("line", (input) => {
+    handleInput(input);
+  });
+}
 
-ipcMain.on('speak-text', (event, text) => {
-  const { exec } = require('child_process');
-  exec(`espeak "${text.replace(/"/g, '')}"`);
-});
+// Export the handler for preload.js or frontend use
+module.exports = { handleInput };
